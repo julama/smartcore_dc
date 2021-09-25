@@ -205,7 +205,7 @@ impl<T: RealNumber> fmt::Display for DenseMatrix<T> {
             rows.push(
                 self.get_row_as_vec(r)
                     .iter()
-                    .map(|x| (x.unwrap() * 1e4).round() / 1e4)
+                    .map(|x| (x)
                     .collect(),
             );
         }
