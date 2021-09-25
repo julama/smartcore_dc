@@ -12,6 +12,7 @@ use rust_decimal::{Decimal}; //to delete
 use rust_decimal::prelude::*;
 use num::*;
 use std::cmp::{PartialOrd, PartialEq};
+use smartcore::math::num::RealNumber;
 
 /// Defines real number
 /// <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
@@ -55,87 +56,6 @@ pub trait RealNumber:
     fn to_f32_bits(self) -> u32;
 }
 
-impl RealNumber for f64 {
-    fn copysign(self, sign: Self) -> Self {
-        self.copysign(sign)
-    }
-
-    fn ln_1pe(self) -> f64 {
-        if self > 15. {
-            self
-        } else {
-            self.exp().ln_1p()
-        }
-    }
-
-    fn sigmoid(self) -> f64 {
-        if self < -40. {
-            0.
-        } else if self > 40. {
-            1.
-        } else {
-            1. / (1. + f64::exp(-self))
-        }
-    }
-
-    fn rand() -> f64 {
-        let mut rng = rand::thread_rng();
-        rng.gen()
-    }
-
-    fn two() -> Self {
-        2f64
-    }
-
-    fn half() -> Self {
-        0.5f64
-    }
-
-    fn to_f32_bits(self) -> u32 {
-        self.to_bits() as u32
-    }
-}
-
-impl RealNumber for f32 {
-    fn copysign(self, sign: Self) -> Self {
-        self.copysign(sign)
-    }
-
-    fn ln_1pe(self) -> f32 {
-        if self > 15. {
-            self
-        } else {
-            self.exp().ln_1p()
-        }
-    }
-
-    fn sigmoid(self) -> f32 {
-        if self < -40. {
-            0.
-        } else if self > 40. {
-            1.
-        } else {
-            1. / (1. + f32::exp(-self))
-        }
-    }
-
-    fn rand() -> f32 {
-        let mut rng = rand::thread_rng();
-        rng.gen()
-    }
-
-    fn two() -> Self {
-        2f32
-    }
-
-    fn half() -> Self {
-        0.5f32
-    }
-
-    fn to_f32_bits(self) -> u32 {
-        self.to_bits()
-    }
-}
 
 impl RealNumber for Decimal {
     fn copysign(self, sign: Self) -> Self {
@@ -178,16 +98,4 @@ impl RealNumber for Decimal {
     fn to_f32_bits(self) -> u32 {
         todo!()//self.to_string()
     } //what is it used for?
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn sigmoid() {
-        assert_eq!(1.0.sigmoid(), 0.7310585786300049);
-        assert_eq!(41.0.sigmoid(), 1.);
-        assert_eq!((-41.0).sigmoid(), 0.);
-    }
 }
