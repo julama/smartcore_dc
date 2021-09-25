@@ -53,7 +53,7 @@ pub trait RealNumber:
     }
 
     /// Raw transmutation to u64
-    fn to_f32_bits(self) -> u32;
+    //fn to_f32_bits(self) -> u32;
 }
 
 impl RealNumber for Decimal {
@@ -94,16 +94,7 @@ impl RealNumber for Decimal {
         Decimal::new(05, 1)
     }
 
-    fn to_f32_bits(self) -> u32 {
-        todo!()//self.to_string()
+    //fn to_f32_bits(self) -> u32 {
+        //todo!()//self.to_string()
     } //what is it used for?
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn sigmoid() {
-    }
 }

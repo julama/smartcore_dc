@@ -72,30 +72,30 @@
 //! ```
 
 /// Various algorithms and helper methods that are used elsewhere in SmartCore
-pub mod algorithm;
+//pub mod algorithm;
 /// Algorithms for clustering of unlabeled data
-pub mod cluster;
+//pub mod cluster;
 /// Various datasets
 /// Matrix decomposition algorithms
-pub mod decomposition;
+//pub mod decomposition;
 /// Ensemble methods, including Random Forest classifier and regressor
-pub mod ensemble;
+//pub mod ensemble;
 pub mod error;
 /// Diverse collection of linear algebra abstractions and methods that power SmartCore algorithms
 pub mod linalg;
 /// Supervised classification and regression models that assume linear relationship between dependent and explanatory variables.
-pub mod linear;
+//pub mod linear;
 /// Helper methods and classes, including definitions of distance metrics
 pub mod math;
 /// Functions for assessing prediction error.
-pub mod metrics;
-pub mod model_selection;
+//pub mod metrics;
+//pub mod model_selection;
 ///  Supervised learning algorithms based on applying the Bayes theorem with the independence assumptions between predictors
-pub mod naive_bayes;
+//pub mod naive_bayes;
 /// Supervised neighbors-based learning methods
 pub mod neighbors;
-pub(crate) mod optimization;
+//pub(crate) mod optimization;
 /// Support Vector Machines
-pub mod svm;
+//pub mod svm;
 /// Supervised tree-based learning methods
-pub mod tree;
+//pub mod tree;
