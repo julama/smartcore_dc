@@ -56,7 +56,6 @@ pub trait RealNumber:
     fn to_f32_bits(self) -> u32;
 }
 
-
 impl RealNumber for Decimal {
     fn copysign(self, sign: Self) -> Self {
         self.copysign(sign)
@@ -98,4 +97,13 @@ impl RealNumber for Decimal {
     fn to_f32_bits(self) -> u32 {
         todo!()//self.to_string()
     } //what is it used for?
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sigmoid() {
+    }
 }
