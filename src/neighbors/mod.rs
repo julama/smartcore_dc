@@ -37,8 +37,8 @@ use serde::{Deserialize, Serialize};
 
 /// K Nearest Neighbors Classifier
 pub mod knn_classifier;
-/// K Nearest Neighbors Regressor
-pub mod knn_regressor;
+// K Nearest Neighbors Regressor
+//pub mod knn_regressor;
 
 /// `KNNAlgorithmName` maintains a list of supported search algorithms, see [KNN algorithms](../algorithm/neighbour/index.html)
 #[deprecated(

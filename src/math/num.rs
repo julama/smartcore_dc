@@ -52,7 +52,7 @@ pub trait RealNumber:
         self * self
     }
 
-    /// Raw transmutation to u64
+    // Raw transmutation to u64
     //fn to_f32_bits(self) -> u32;
 }
 
