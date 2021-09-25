@@ -84,7 +84,7 @@ pub(crate) fn deserialize_data(
     // read the same file back into a Vec of bytes
     let (num_samples, num_features) = {
         //changed to [0u8; 4] from [0u8; 8] for wasm_wasm
-        let mut buffer = [0u8; 8];
+        let mut buffer = [0u8; 4];
         buffer.copy_from_slice(&bytes[0..8]);
         let num_features = usize::from_le_bytes(buffer);
         buffer.copy_from_slice(&bytes[8..16]);
