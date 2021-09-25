@@ -18,7 +18,7 @@ use crate::linalg::Matrix;
 pub use crate::linalg::{BaseMatrix, BaseVector};
 use crate::math::num::RealNumber;
 use rust_decimal::prelude::*;
-
+const ONE: Decimal = Decimal::from_parts_raw(1, 0, 0, 0);
 
 impl<T: RealNumber> BaseVector<T> for Vec<T> {
     fn get(&self, i: usize) -> T {
@@ -205,7 +205,7 @@ impl<T: RealNumber> fmt::Display for DenseMatrix<T> {
             rows.push(
                 self.get_row_as_vec(r)
                     .iter()
-                    .map(|x| (x)
+                    .map(|x| (x * ONE).round() / ONE)
                     .collect(),
             );
         }
