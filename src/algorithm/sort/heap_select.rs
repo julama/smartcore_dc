@@ -92,68 +92,68 @@ impl<'a, T: PartialOrd + Debug> HeapSelection<T> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn with_capacity() {
-        let heap = HeapSelection::<i32>::with_capacity(3);
-        assert_eq!(3, heap.k);
-    }
-
-    #[test]
-    fn test_add() {
-        let mut heap = HeapSelection::with_capacity(3);
-        heap.add(-5);
-        assert_eq!(-5, *heap.peek());
-        heap.add(333);
-        assert_eq!(333, *heap.peek());
-        heap.add(13);
-        heap.add(10);
-        heap.add(2);
-        heap.add(0);
-        heap.add(40);
-        heap.add(30);
-        assert_eq!(8, heap.n);
-        assert_eq!(vec![2, 0, -5], heap.get());
-    }
-
-    #[test]
-    fn test_add1() {
-        let mut heap = HeapSelection::with_capacity(3);
-        heap.add(std::f64::INFINITY);
-        heap.add(-5f64);
-        heap.add(4f64);
-        heap.add(-1f64);
-        heap.add(2f64);
-        heap.add(1f64);
-        heap.add(0f64);
-        assert_eq!(7, heap.n);
-        assert_eq!(vec![0f64, -1f64, -5f64], heap.get());
-    }
-
-    #[test]
-    fn test_add2() {
-        let mut heap = HeapSelection::with_capacity(3);
-        heap.add(std::f64::INFINITY);
-        heap.add(0.0);
-        heap.add(8.4852);
-        heap.add(5.6568);
-        heap.add(2.8284);
-        assert_eq!(5, heap.n);
-        assert_eq!(vec![5.6568, 2.8284, 0.0], heap.get());
-    }
-
-    #[test]
-    fn test_add_ordered() {
-        let mut heap = HeapSelection::with_capacity(3);
-        heap.add(1.);
-        heap.add(2.);
-        heap.add(3.);
-        heap.add(4.);
-        heap.add(5.);
-        heap.add(6.);
-        assert_eq!(vec![3., 2., 1.], heap.get());
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use super::*;
+//
+//    #[test]
+//    fn with_capacity() {
+//        let heap = HeapSelection::<i32>::with_capacity(3);
+//        assert_eq!(3, heap.k);
+//    }
+//
+//    #[test]
+//    fn test_add() {
+//        let mut heap = HeapSelection::with_capacity(3);
+//        heap.add(-5);
+//        assert_eq!(-5, *heap.peek());
+//        heap.add(333);
+//        assert_eq!(333, *heap.peek());
+//        heap.add(13);
+//        heap.add(10);
+//        heap.add(2);
+//        heap.add(0);
+//        heap.add(40);
+//        heap.add(30);
+//        assert_eq!(8, heap.n);
+//        assert_eq!(vec![2, 0, -5], heap.get());
+//    }
+//
+//    #[test]
+//    fn test_add1() {
+//        let mut heap = HeapSelection::with_capacity(3);
+//        heap.add(std::f64::INFINITY);
+//        heap.add(-5f64);
+//        heap.add(4f64);
+//        heap.add(-1f64);
+//        heap.add(2f64);
+//        heap.add(1f64);
+//        heap.add(0f64);
+//        assert_eq!(7, heap.n);
+//        assert_eq!(vec![0f64, -1f64, -5f64], heap.get());
+//    }
+//
+//    #[test]
+//    fn test_add2() {
+//        let mut heap = HeapSelection::with_capacity(3);
+//        heap.add(std::f64::INFINITY);
+//        heap.add(0.0);
+//        heap.add(8.4852);
+//        heap.add(5.6568);
+//        heap.add(2.8284);
+//        assert_eq!(5, heap.n);
+//        assert_eq!(vec![5.6568, 2.8284, 0.0], heap.get());
+//    }
+//
+//    #[test]
+//    fn test_add_ordered() {
+//        let mut heap = HeapSelection::with_capacity(3);
+//        heap.add(1.);
+//        heap.add(2.);
+//        heap.add(3.);
+//        heap.add(4.);
+//        heap.add(5.);
+//        heap.add(6.);
+//        assert_eq!(vec![3., 2., 1.], heap.get());
+//    }
+//}

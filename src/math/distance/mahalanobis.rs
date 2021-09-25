@@ -126,28 +126,28 @@ impl<T: RealNumber, M: Matrix<T>> Distance<Vec<T>, T> for Mahalanobis<T, M> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::linalg::naive::dense_matrix::*;
-
-    #[test]
-    fn mahalanobis_distance() {
-        let data = DenseMatrix::from_2d_array(&[
-            &[64., 580., 29.],
-            &[66., 570., 33.],
-            &[68., 590., 37.],
-            &[69., 660., 46.],
-            &[73., 600., 55.],
-        ]);
-
-        let a = data.column_mean();
-        let b = vec![66., 640., 44.];
-
-        let mahalanobis = Mahalanobis::new(&data);
-
-        let md: f64 = mahalanobis.distance(&a, &b);
-
-        assert!((md - 5.33).abs() < 1e-2);
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use super::*;
+//    use crate::linalg::naive::dense_matrix::*;
+//
+//    #[test]
+//    fn mahalanobis_distance() {
+//        let data = DenseMatrix::from_2d_array(&[
+//            &[64., 580., 29.],
+//            &[66., 570., 33.],
+//            &[68., 590., 37.],
+//            &[69., 660., 46.],
+//            &[73., 600., 55.],
+//        ]);
+//
+//        let a = data.column_mean();
+//        let b = vec![66., 640., 44.];
+//
+//        let mahalanobis = Mahalanobis::new(&data);
+//
+//        let md: f64 = mahalanobis.distance(&a, &b);
+//
+//        assert!((md - 5.33).abs() < 1e-2);
+//    }
+//}

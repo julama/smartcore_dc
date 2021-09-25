@@ -47,6 +47,9 @@ pub trait RealNumber:
     /// Returns .5
     fn half() -> Self;
 
+    /// Returns 1.3
+    fn from_f() -> Self;
+
     /// Returns \\( x^2 \\)
     fn square(self) -> Self {
         self * self
@@ -93,6 +96,11 @@ impl RealNumber for Decimal {
     fn half() -> Self {
         Decimal::new(05, 1)
     }
+
+    fn from_f() -> Self  {
+        Decimal::new(13, 1)
+    }
+
 
     //fn to_f32_bits(self) -> u32 {
         //todo!()//self.to_string()

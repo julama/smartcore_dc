@@ -657,28 +657,28 @@ impl<'a, T: RealNumber, M: BaseMatrix<T>> Iterator for RowIter<'a, T, M> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::linalg::BaseVector;
-
-    #[test]
-    fn mean() {
-        let m = vec![1., 2., 3.];
-
-        assert_eq!(m.mean(), 2.0);
-    }
-
-    #[test]
-    fn std() {
-        let m = vec![1., 2., 3.];
-
-        assert!((m.std() - 0.81f64).abs() < 1e-2);
-    }
-
-    #[test]
-    fn var() {
-        let m = vec![1., 2., 3., 4.];
-
-        assert!((m.var() - 1.25f64).abs() < std::f64::EPSILON);
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use crate::linalg::BaseVector;
+//
+//    #[test]
+//    fn mean() {
+//        let m = vec![1., 2., 3.];
+//
+//        assert_eq!(m.mean(), 2.0);
+//    }
+//
+//    #[test]
+//    fn std() {
+//        let m = vec![1., 2., 3.];
+//
+//        assert!((m.std() - 0.81f64).abs() < 1e-2);
+//    }
+//
+//    #[test]
+//    fn var() {
+//        let m = vec![1., 2., 3., 4.];
+//
+//        assert!((m.var() - 1.25f64).abs() < std::f64::EPSILON);
+//    }
+//}

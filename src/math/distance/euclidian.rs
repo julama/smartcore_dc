@@ -51,17 +51,17 @@ impl<T: RealNumber> Distance<Vec<T>, T> for Euclidian {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn squared_distance() {
-        let a = vec![1., 2., 3.];
-        let b = vec![4., 5., 6.];
-
-        let l2: f64 = Euclidian {}.distance(&a, &b);
-
-        assert!((l2 - 5.19615242).abs() < 1e-8);
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use super::*;
+//
+//    #[test]
+//    fn squared_distance() {
+//        let a = vec![1., 2., 3.];
+//        let b = vec![4., 5., 6.];
+//
+//        let l2: f64 = Euclidian {}.distance(&a, &b);
+//
+//        assert!((l2 - 5.19615242).abs() < 1e-8);
+//    }
+//}

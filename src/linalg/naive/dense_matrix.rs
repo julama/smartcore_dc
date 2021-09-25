@@ -197,6 +197,7 @@ pub struct DenseMatrixIterator<'a, T: RealNumber> {
     m: &'a DenseMatrix<T>,
 }
 
+// Fix this function for Decimal
 impl<T: RealNumber> fmt::Display for DenseMatrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut rows: Vec<Vec<Decimal>> = Vec::new();
