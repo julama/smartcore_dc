@@ -17,6 +17,8 @@ use crate::linalg::svd::SVDDecomposableMatrix;
 use crate::linalg::Matrix;
 pub use crate::linalg::{BaseMatrix, BaseVector};
 use crate::math::num::RealNumber;
+use rust_decimal::prelude::*;
+
 
 impl<T: RealNumber> BaseVector<T> for Vec<T> {
     fn get(&self, i: usize) -> T {
@@ -196,20 +198,20 @@ pub struct DenseMatrixIterator<'a, T: RealNumber> {
     m: &'a DenseMatrix<T>,
 }
 
-//impl<T: RealNumber> fmt::Display for DenseMatrix<T> {
-//    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//        let mut rows: Vec<Vec<f64>> = Vec::new();
-//        for r in 0..self.nrows {
-//            rows.push(
-//                self.get_row_as_vec(r)
-//                    .iter()
-//                    .map(|x| (x.to_f64().unwrap() * 1e4).round() / 1e4)
-//                    .collect(),
-//            );
-//        }
-//        write!(f, "{:?}", rows)
-//    }
-//}
+impl<T: RealNumber> fmt::Display for DenseMatrix<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut rows: Vec<Vec<Decimal>> = Vec::new();
+        for r in 0..self.nrows {
+            rows.push(
+                self.get_row_as_vec(r)
+                    .iter()
+                    .map(|x| (x.unwrap() * 1e4).round() / 1e4)
+                    .collect(),
+            );
+        }
+        write!(f, "{:?}", rows)
+    }
+}
 
 impl<T: RealNumber> DenseMatrix<T> {
     /// Create new instance of `DenseMatrix` without copying data.
