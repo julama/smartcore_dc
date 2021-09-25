@@ -72,7 +72,7 @@
 //! ```
 
 /// Various algorithms and helper methods that are used elsewhere in SmartCore
-//pub mod algorithm;
+pub mod algorithm;
 /// Algorithms for clustering of unlabeled data
 //pub mod cluster;
 /// Various datasets
