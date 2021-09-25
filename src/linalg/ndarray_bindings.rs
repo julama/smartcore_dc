@@ -518,444 +518,444 @@ impl<T: RealNumber + ScalarOperand + AddAssign + SubAssign + MulAssign + DivAssi
 {
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::ensemble::random_forest_regressor::*;
-    use crate::linear::logistic_regression::*;
-    use crate::metrics::mean_absolute_error;
-    use ndarray::{arr1, arr2, Array1, Array2};
-
-    #[test]
-    fn vec_get_set() {
-        let mut result = arr1(&[1., 2., 3.]);
-        let expected = arr1(&[1., 5., 3.]);
-
-        result.set(1, 5.);
-
-        assert_eq!(result, expected);
-        assert_eq!(5., BaseVector::get(&result, 1));
-    }
-
-    #[test]
-    fn vec_len() {
-        let v = arr1(&[1., 2., 3.]);
-        assert_eq!(3, v.len());
-    }
-
-    #[test]
-    fn vec_to_vec() {
-        let v = arr1(&[1., 2., 3.]);
-        assert_eq!(vec![1., 2., 3.], v.to_vec());
-    }
-
-    #[test]
-    fn vec_dot() {
-        let v1 = arr1(&[1., 2., 3.]);
-        let v2 = arr1(&[4., 5., 6.]);
-        assert_eq!(32.0, BaseVector::dot(&v1, &v2));
-    }
-
-    #[test]
-    fn vec_approximate_eq() {
-        let a = arr1(&[1., 2., 3.]);
-        let noise = arr1(&[1e-5, 2e-5, 3e-5]);
-        assert!(a.approximate_eq(&(&noise + &a), 1e-4));
-        assert!(!a.approximate_eq(&(&noise + &a), 1e-5));
-    }
-
-    #[test]
-    fn from_to_row_vec() {
-        let vec = arr1(&[1., 2., 3.]);
-        assert_eq!(Array2::from_row_vector(vec.clone()), arr2(&[[1., 2., 3.]]));
-        assert_eq!(
-            Array2::from_row_vector(vec.clone()).to_row_vector(),
-            arr1(&[1., 2., 3.])
-        );
-    }
-
-    #[test]
-    fn col_matrix_to_row_vector() {
-        let m: Array2<f64> = BaseMatrix::zeros(10, 1);
-        assert_eq!(m.to_row_vector().len(), 10)
-    }
-
-    #[test]
-    fn add_mut() {
-        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let a2 = a1.clone();
-        let a3 = a1.clone() + a2.clone();
-        a1.add_mut(&a2);
-
-        assert_eq!(a1, a3);
-    }
-
-    #[test]
-    fn sub_mut() {
-        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let a2 = a1.clone();
-        let a3 = a1.clone() - a2.clone();
-        a1.sub_mut(&a2);
-
-        assert_eq!(a1, a3);
-    }
-
-    #[test]
-    fn mul_mut() {
-        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let a2 = a1.clone();
-        let a3 = a1.clone() * a2.clone();
-        a1.mul_mut(&a2);
-
-        assert_eq!(a1, a3);
-    }
-
-    #[test]
-    fn div_mut() {
-        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let a2 = a1.clone();
-        let a3 = a1.clone() / a2.clone();
-        a1.div_mut(&a2);
-
-        assert_eq!(a1, a3);
-    }
-
-    #[test]
-    fn div_element_mut() {
-        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        a.div_element_mut(1, 1, 5.);
-
-        assert_eq!(BaseMatrix::get(&a, 1, 1), 1.);
-    }
-
-    #[test]
-    fn mul_element_mut() {
-        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        a.mul_element_mut(1, 1, 5.);
-
-        assert_eq!(BaseMatrix::get(&a, 1, 1), 25.);
-    }
-
-    #[test]
-    fn add_element_mut() {
-        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        a.add_element_mut(1, 1, 5.);
-
-        assert_eq!(BaseMatrix::get(&a, 1, 1), 10.);
-    }
-
-    #[test]
-    fn sub_element_mut() {
-        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        a.sub_element_mut(1, 1, 5.);
-
-        assert_eq!(BaseMatrix::get(&a, 1, 1), 0.);
-    }
-
-    #[test]
-    fn vstack_hstack() {
-        let a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let a2 = arr2(&[[7.], [8.]]);
-
-        let a3 = arr2(&[[9., 10., 11., 12.]]);
-
-        let expected = arr2(&[[1., 2., 3., 7.], [4., 5., 6., 8.], [9., 10., 11., 12.]]);
-
-        let result = a1.h_stack(&a2).v_stack(&a3);
-
-        assert_eq!(result, expected);
-    }
-
-    #[test]
-    fn get_set() {
-        let mut result = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let expected = arr2(&[[1., 2., 3.], [4., 10., 6.]]);
-
-        result.set(1, 1, 10.);
-
-        assert_eq!(result, expected);
-        assert_eq!(10., BaseMatrix::get(&result, 1, 1));
-    }
-
-    #[test]
-    fn matmul() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        let b = arr2(&[[1., 2.], [3., 4.], [5., 6.]]);
-        let expected = arr2(&[[22., 28.], [49., 64.]]);
-        let result = BaseMatrix::matmul(&a, &b);
-        assert_eq!(result, expected);
-    }
-
-    #[test]
-    fn dot() {
-        let a = arr2(&[[1., 2., 3.]]);
-        let b = arr2(&[[1., 2., 3.]]);
-        assert_eq!(14., BaseMatrix::dot(&a, &b));
-    }
-
-    #[test]
-    fn slice() {
-        let a = arr2(&[
-            [1., 2., 3., 1., 2.],
-            [4., 5., 6., 3., 4.],
-            [7., 8., 9., 5., 6.],
-        ]);
-        let expected = arr2(&[[2., 3.], [5., 6.]]);
-        let result = BaseMatrix::slice(&a, 0..2, 1..3);
-        assert_eq!(result, expected);
-    }
-
-    #[test]
-    fn scalar_ops() {
-        let a = arr2(&[[1., 2., 3.]]);
-        assert_eq!(&arr2(&[[2., 3., 4.]]), a.clone().add_scalar_mut(1.));
-        assert_eq!(&arr2(&[[0., 1., 2.]]), a.clone().sub_scalar_mut(1.));
-        assert_eq!(&arr2(&[[2., 4., 6.]]), a.clone().mul_scalar_mut(2.));
-        assert_eq!(&arr2(&[[0.5, 1., 1.5]]), a.clone().div_scalar_mut(2.));
-    }
-
-    #[test]
-    fn transpose() {
-        let m = arr2(&[[1.0, 3.0], [2.0, 4.0]]);
-        let expected = arr2(&[[1.0, 2.0], [3.0, 4.0]]);
-        let m_transposed = m.transpose();
-        assert_eq!(m_transposed, expected);
-    }
-
-    #[test]
-    fn norm() {
-        let v = arr2(&[[3., -2., 6.]]);
-        assert_eq!(v.norm(1.), 11.);
-        assert_eq!(v.norm(2.), 7.);
-        assert_eq!(v.norm(std::f64::INFINITY), 6.);
-        assert_eq!(v.norm(std::f64::NEG_INFINITY), 2.);
-    }
-
-    #[test]
-    fn negative_mut() {
-        let mut v = arr2(&[[3., -2., 6.]]);
-        v.negative_mut();
-        assert_eq!(v, arr2(&[[-3., 2., -6.]]));
-    }
-
-    #[test]
-    fn reshape() {
-        let m_orig = arr2(&[[1., 2., 3., 4., 5., 6.]]);
-        let m_2_by_3 = BaseMatrix::reshape(&m_orig, 2, 3);
-        let m_result = BaseMatrix::reshape(&m_2_by_3, 1, 6);
-        assert_eq!(BaseMatrix::shape(&m_2_by_3), (2, 3));
-        assert_eq!(BaseMatrix::get(&m_2_by_3, 1, 1), 5.);
-        assert_eq!(BaseMatrix::get(&m_result, 0, 1), 2.);
-        assert_eq!(BaseMatrix::get(&m_result, 0, 3), 4.);
-    }
-
-    #[test]
-    fn copy_from() {
-        let mut src = arr2(&[[1., 2., 3.]]);
-        let dst = Array2::<f64>::zeros((1, 3));
-        src.copy_from(&dst);
-        assert_eq!(src, dst);
-    }
-
-    #[test]
-    fn min_max_sum() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
-        assert_eq!(21., a.sum());
-        assert_eq!(1., a.min());
-        assert_eq!(6., a.max());
-    }
-
-    #[test]
-    fn max_diff() {
-        let a1 = arr2(&[[1., 2., 3.], [4., -5., 6.]]);
-        let a2 = arr2(&[[2., 3., 4.], [1., 0., -12.]]);
-        assert_eq!(a1.max_diff(&a2), 18.);
-        assert_eq!(a2.max_diff(&a2), 0.);
-    }
-
-    #[test]
-    fn softmax_mut() {
-        let mut prob: Array2<f64> = arr2(&[[1., 2., 3.]]);
-        prob.softmax_mut();
-        assert!((BaseMatrix::get(&prob, 0, 0) - 0.09).abs() < 0.01);
-        assert!((BaseMatrix::get(&prob, 0, 1) - 0.24).abs() < 0.01);
-        assert!((BaseMatrix::get(&prob, 0, 2) - 0.66).abs() < 0.01);
-    }
-
-    #[test]
-    fn pow_mut() {
-        let mut a = arr2(&[[1., 2., 3.]]);
-        a.pow_mut(3.);
-        assert_eq!(a, arr2(&[[1., 8., 27.]]));
-    }
-
-    #[test]
-    fn argmax() {
-        let a = arr2(&[[1., 2., 3.], [-5., -6., -7.], [0.1, 0.2, 0.1]]);
-        let res = a.argmax();
-        assert_eq!(res, vec![2, 0, 1]);
-    }
-
-    #[test]
-    fn unique() {
-        let a = arr2(&[[1., 2., 2.], [-2., -6., -7.], [2., 3., 4.]]);
-        let res = a.unique();
-        assert_eq!(res.len(), 7);
-        assert_eq!(res, vec![-7., -6., -2., 1., 2., 3., 4.]);
-    }
-
-    #[test]
-    fn get_row_as_vector() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-        let res = a.get_row_as_vec(1);
-        assert_eq!(res, vec![4., 5., 6.]);
-    }
-
-    #[test]
-    fn get_row() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-        assert_eq!(arr1(&[4., 5., 6.]), a.get_row(1));
-    }
-
-    #[test]
-    fn get_col_as_vector() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-        let res = a.get_col_as_vec(1);
-        assert_eq!(res, vec![2., 5., 8.]);
-    }
-
-    #[test]
-    fn copy_row_col_as_vec() {
-        let m = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-        let mut v = vec![0f32; 3];
-
-        m.copy_row_as_vec(1, &mut v);
-        assert_eq!(v, vec!(4., 5., 6.));
-        m.copy_col_as_vec(1, &mut v);
-        assert_eq!(v, vec!(2., 5., 8.));
-    }
-
-    #[test]
-    fn col_mean() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-        let res = a.column_mean();
-        assert_eq!(res, vec![4., 5., 6.]);
-    }
-
-    #[test]
-    fn eye() {
-        let a = arr2(&[[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
-        let res: Array2<f64> = BaseMatrix::eye(3);
-        assert_eq!(res, a);
-    }
-
-    #[test]
-    fn rand() {
-        let m: Array2<f64> = BaseMatrix::rand(3, 3);
-        for c in 0..3 {
-            for r in 0..3 {
-                assert!(m[[r, c]] != 0f64);
-            }
-        }
-    }
-
-    #[test]
-    fn approximate_eq() {
-        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-        let noise = arr2(&[[1e-5, 2e-5, 3e-5], [4e-5, 5e-5, 6e-5], [7e-5, 8e-5, 9e-5]]);
-        assert!(a.approximate_eq(&(&noise + &a), 1e-4));
-        assert!(!a.approximate_eq(&(&noise + &a), 1e-5));
-    }
-
-    #[test]
-    fn abs_mut() {
-        let mut a = arr2(&[[1., -2.], [3., -4.]]);
-        let expected = arr2(&[[1., 2.], [3., 4.]]);
-        a.abs_mut();
-        assert_eq!(a, expected);
-    }
-
-    #[test]
-    fn lr_fit_predict_iris() {
-        let x = arr2(&[
-            [5.1, 3.5, 1.4, 0.2],
-            [4.9, 3.0, 1.4, 0.2],
-            [4.7, 3.2, 1.3, 0.2],
-            [4.6, 3.1, 1.5, 0.2],
-            [5.0, 3.6, 1.4, 0.2],
-            [5.4, 3.9, 1.7, 0.4],
-            [4.6, 3.4, 1.4, 0.3],
-            [5.0, 3.4, 1.5, 0.2],
-            [4.4, 2.9, 1.4, 0.2],
-            [4.9, 3.1, 1.5, 0.1],
-            [7.0, 3.2, 4.7, 1.4],
-            [6.4, 3.2, 4.5, 1.5],
-            [6.9, 3.1, 4.9, 1.5],
-            [5.5, 2.3, 4.0, 1.3],
-            [6.5, 2.8, 4.6, 1.5],
-            [5.7, 2.8, 4.5, 1.3],
-            [6.3, 3.3, 4.7, 1.6],
-            [4.9, 2.4, 3.3, 1.0],
-            [6.6, 2.9, 4.6, 1.3],
-            [5.2, 2.7, 3.9, 1.4],
-        ]);
-        let y: Array1<f64> = arr1(&[
-            0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
-        ]);
-
-        let lr = LogisticRegression::fit(&x, &y).unwrap();
-
-        let y_hat = lr.predict(&x).unwrap();
-
-        let error: f64 = y
-            .into_iter()
-            .zip(y_hat.into_iter())
-            .map(|(&a, &b)| (a - b).abs())
-            .sum();
-
-        assert!(error <= 1.0);
-    }
-
-    #[test]
-    fn my_fit_longley_ndarray() {
-        let x = arr2(&[
-            [234.289, 235.6, 159., 107.608, 1947., 60.323],
-            [259.426, 232.5, 145.6, 108.632, 1948., 61.122],
-            [258.054, 368.2, 161.6, 109.773, 1949., 60.171],
-            [284.599, 335.1, 165., 110.929, 1950., 61.187],
-            [328.975, 209.9, 309.9, 112.075, 1951., 63.221],
-            [346.999, 193.2, 359.4, 113.27, 1952., 63.639],
-            [365.385, 187., 354.7, 115.094, 1953., 64.989],
-            [363.112, 357.8, 335., 116.219, 1954., 63.761],
-            [397.469, 290.4, 304.8, 117.388, 1955., 66.019],
-            [419.18, 282.2, 285.7, 118.734, 1956., 67.857],
-            [442.769, 293.6, 279.8, 120.445, 1957., 68.169],
-            [444.546, 468.1, 263.7, 121.95, 1958., 66.513],
-            [482.704, 381.3, 255.2, 123.366, 1959., 68.655],
-            [502.601, 393.1, 251.4, 125.368, 1960., 69.564],
-            [518.173, 480.6, 257.2, 127.852, 1961., 69.331],
-            [554.894, 400.7, 282.7, 130.081, 1962., 70.551],
-        ]);
-        let y = arr1(&[
-            83.0, 88.5, 88.2, 89.5, 96.2, 98.1, 99.0, 100.0, 101.2, 104.6, 108.4, 110.8, 112.6,
-            114.2, 115.7, 116.9,
-        ]);
-
-        let y_hat = RandomForestRegressor::fit(
-            &x,
-            &y,
-            RandomForestRegressorParameters {
-                max_depth: None,
-                min_samples_leaf: 1,
-                min_samples_split: 2,
-                n_trees: 1000,
-                m: Option::None,
-            },
-        )
-        .unwrap()
-        .predict(&x)
-        .unwrap();
-
-        assert!(mean_absolute_error(&y, &y_hat) < 1.0);
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use super::*;
+//    use crate::ensemble::random_forest_regressor::*;
+//    use crate::linear::logistic_regression::*;
+//    use crate::metrics::mean_absolute_error;
+//    use ndarray::{arr1, arr2, Array1, Array2};
+//
+//    #[test]
+//    fn vec_get_set() {
+//        let mut result = arr1(&[1., 2., 3.]);
+//        let expected = arr1(&[1., 5., 3.]);
+//
+//        result.set(1, 5.);
+//
+//        assert_eq!(result, expected);
+//        assert_eq!(5., BaseVector::get(&result, 1));
+//    }
+//
+//    #[test]
+//    fn vec_len() {
+//        let v = arr1(&[1., 2., 3.]);
+//        assert_eq!(3, v.len());
+//    }
+//
+//    #[test]
+//    fn vec_to_vec() {
+//        let v = arr1(&[1., 2., 3.]);
+//        assert_eq!(vec![1., 2., 3.], v.to_vec());
+//    }
+//
+//    #[test]
+//    fn vec_dot() {
+//        let v1 = arr1(&[1., 2., 3.]);
+//        let v2 = arr1(&[4., 5., 6.]);
+//        assert_eq!(32.0, BaseVector::dot(&v1, &v2));
+//    }
+//
+//    #[test]
+//    fn vec_approximate_eq() {
+//        let a = arr1(&[1., 2., 3.]);
+//        let noise = arr1(&[1e-5, 2e-5, 3e-5]);
+//        assert!(a.approximate_eq(&(&noise + &a), 1e-4));
+//        assert!(!a.approximate_eq(&(&noise + &a), 1e-5));
+//    }
+//
+//    #[test]
+//    fn from_to_row_vec() {
+//        let vec = arr1(&[1., 2., 3.]);
+//        assert_eq!(Array2::from_row_vector(vec.clone()), arr2(&[[1., 2., 3.]]));
+//        assert_eq!(
+//            Array2::from_row_vector(vec.clone()).to_row_vector(),
+//            arr1(&[1., 2., 3.])
+//        );
+//    }
+//
+//    #[test]
+//    fn col_matrix_to_row_vector() {
+//        let m: Array2<f64> = BaseMatrix::zeros(10, 1);
+//        assert_eq!(m.to_row_vector().len(), 10)
+//    }
+//
+//    #[test]
+//    fn add_mut() {
+//        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let a2 = a1.clone();
+//        let a3 = a1.clone() + a2.clone();
+//        a1.add_mut(&a2);
+//
+//        assert_eq!(a1, a3);
+//    }
+//
+//    #[test]
+//    fn sub_mut() {
+//        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let a2 = a1.clone();
+//        let a3 = a1.clone() - a2.clone();
+//        a1.sub_mut(&a2);
+//
+//        assert_eq!(a1, a3);
+//    }
+//
+//    #[test]
+//    fn mul_mut() {
+//        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let a2 = a1.clone();
+//        let a3 = a1.clone() * a2.clone();
+//        a1.mul_mut(&a2);
+//
+//        assert_eq!(a1, a3);
+//    }
+//
+//    #[test]
+//    fn div_mut() {
+//        let mut a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let a2 = a1.clone();
+//        let a3 = a1.clone() / a2.clone();
+//        a1.div_mut(&a2);
+//
+//        assert_eq!(a1, a3);
+//    }
+//
+//    #[test]
+//    fn div_element_mut() {
+//        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        a.div_element_mut(1, 1, 5.);
+//
+//        assert_eq!(BaseMatrix::get(&a, 1, 1), 1.);
+//    }
+//
+//    #[test]
+//    fn mul_element_mut() {
+//        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        a.mul_element_mut(1, 1, 5.);
+//
+//        assert_eq!(BaseMatrix::get(&a, 1, 1), 25.);
+//    }
+//
+//    #[test]
+//    fn add_element_mut() {
+//        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        a.add_element_mut(1, 1, 5.);
+//
+//        assert_eq!(BaseMatrix::get(&a, 1, 1), 10.);
+//    }
+//
+//    #[test]
+//    fn sub_element_mut() {
+//        let mut a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        a.sub_element_mut(1, 1, 5.);
+//
+//        assert_eq!(BaseMatrix::get(&a, 1, 1), 0.);
+//    }
+//
+//    #[test]
+//    fn vstack_hstack() {
+//        let a1 = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let a2 = arr2(&[[7.], [8.]]);
+//
+//        let a3 = arr2(&[[9., 10., 11., 12.]]);
+//
+//        let expected = arr2(&[[1., 2., 3., 7.], [4., 5., 6., 8.], [9., 10., 11., 12.]]);
+//
+//        let result = a1.h_stack(&a2).v_stack(&a3);
+//
+//        assert_eq!(result, expected);
+//    }
+//
+//    #[test]
+//    fn get_set() {
+//        let mut result = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let expected = arr2(&[[1., 2., 3.], [4., 10., 6.]]);
+//
+//        result.set(1, 1, 10.);
+//
+//        assert_eq!(result, expected);
+//        assert_eq!(10., BaseMatrix::get(&result, 1, 1));
+//    }
+//
+//    #[test]
+//    fn matmul() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        let b = arr2(&[[1., 2.], [3., 4.], [5., 6.]]);
+//        let expected = arr2(&[[22., 28.], [49., 64.]]);
+//        let result = BaseMatrix::matmul(&a, &b);
+//        assert_eq!(result, expected);
+//    }
+//
+//    #[test]
+//    fn dot() {
+//        let a = arr2(&[[1., 2., 3.]]);
+//        let b = arr2(&[[1., 2., 3.]]);
+//        assert_eq!(14., BaseMatrix::dot(&a, &b));
+//    }
+//
+//    #[test]
+//    fn slice() {
+//        let a = arr2(&[
+//            [1., 2., 3., 1., 2.],
+//            [4., 5., 6., 3., 4.],
+//            [7., 8., 9., 5., 6.],
+//        ]);
+//        let expected = arr2(&[[2., 3.], [5., 6.]]);
+//        let result = BaseMatrix::slice(&a, 0..2, 1..3);
+//        assert_eq!(result, expected);
+//    }
+//
+//    #[test]
+//    fn scalar_ops() {
+//        let a = arr2(&[[1., 2., 3.]]);
+//        assert_eq!(&arr2(&[[2., 3., 4.]]), a.clone().add_scalar_mut(1.));
+//        assert_eq!(&arr2(&[[0., 1., 2.]]), a.clone().sub_scalar_mut(1.));
+//        assert_eq!(&arr2(&[[2., 4., 6.]]), a.clone().mul_scalar_mut(2.));
+//        assert_eq!(&arr2(&[[0.5, 1., 1.5]]), a.clone().div_scalar_mut(2.));
+//    }
+//
+//    #[test]
+//    fn transpose() {
+//        let m = arr2(&[[1.0, 3.0], [2.0, 4.0]]);
+//        let expected = arr2(&[[1.0, 2.0], [3.0, 4.0]]);
+//        let m_transposed = m.transpose();
+//        assert_eq!(m_transposed, expected);
+//    }
+//
+//    #[test]
+//    fn norm() {
+//        let v = arr2(&[[3., -2., 6.]]);
+//        assert_eq!(v.norm(1.), 11.);
+//        assert_eq!(v.norm(2.), 7.);
+//        assert_eq!(v.norm(std::f64::INFINITY), 6.);
+//        assert_eq!(v.norm(std::f64::NEG_INFINITY), 2.);
+//    }
+//
+//    #[test]
+//    fn negative_mut() {
+//        let mut v = arr2(&[[3., -2., 6.]]);
+//        v.negative_mut();
+//        assert_eq!(v, arr2(&[[-3., 2., -6.]]));
+//    }
+//
+//    #[test]
+//    fn reshape() {
+//        let m_orig = arr2(&[[1., 2., 3., 4., 5., 6.]]);
+//        let m_2_by_3 = BaseMatrix::reshape(&m_orig, 2, 3);
+//        let m_result = BaseMatrix::reshape(&m_2_by_3, 1, 6);
+//        assert_eq!(BaseMatrix::shape(&m_2_by_3), (2, 3));
+//        assert_eq!(BaseMatrix::get(&m_2_by_3, 1, 1), 5.);
+//        assert_eq!(BaseMatrix::get(&m_result, 0, 1), 2.);
+//        assert_eq!(BaseMatrix::get(&m_result, 0, 3), 4.);
+//    }
+//
+//    #[test]
+//    fn copy_from() {
+//        let mut src = arr2(&[[1., 2., 3.]]);
+//        let dst = Array2::<f64>::zeros((1, 3));
+//        src.copy_from(&dst);
+//        assert_eq!(src, dst);
+//    }
+//
+//    #[test]
+//    fn min_max_sum() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.]]);
+//        assert_eq!(21., a.sum());
+//        assert_eq!(1., a.min());
+//        assert_eq!(6., a.max());
+//    }
+//
+//    #[test]
+//    fn max_diff() {
+//        let a1 = arr2(&[[1., 2., 3.], [4., -5., 6.]]);
+//        let a2 = arr2(&[[2., 3., 4.], [1., 0., -12.]]);
+//        assert_eq!(a1.max_diff(&a2), 18.);
+//        assert_eq!(a2.max_diff(&a2), 0.);
+//    }
+//
+//    #[test]
+//    fn softmax_mut() {
+//        let mut prob: Array2<f64> = arr2(&[[1., 2., 3.]]);
+//        prob.softmax_mut();
+//        assert!((BaseMatrix::get(&prob, 0, 0) - 0.09).abs() < 0.01);
+//        assert!((BaseMatrix::get(&prob, 0, 1) - 0.24).abs() < 0.01);
+//        assert!((BaseMatrix::get(&prob, 0, 2) - 0.66).abs() < 0.01);
+//    }
+//
+//    #[test]
+//    fn pow_mut() {
+//        let mut a = arr2(&[[1., 2., 3.]]);
+//        a.pow_mut(3.);
+//        assert_eq!(a, arr2(&[[1., 8., 27.]]));
+//    }
+//
+//    #[test]
+//    fn argmax() {
+//        let a = arr2(&[[1., 2., 3.], [-5., -6., -7.], [0.1, 0.2, 0.1]]);
+//        let res = a.argmax();
+//        assert_eq!(res, vec![2, 0, 1]);
+//    }
+//
+//    #[test]
+//    fn unique() {
+//        let a = arr2(&[[1., 2., 2.], [-2., -6., -7.], [2., 3., 4.]]);
+//        let res = a.unique();
+//        assert_eq!(res.len(), 7);
+//        assert_eq!(res, vec![-7., -6., -2., 1., 2., 3., 4.]);
+//    }
+//
+//    #[test]
+//    fn get_row_as_vector() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
+//        let res = a.get_row_as_vec(1);
+//        assert_eq!(res, vec![4., 5., 6.]);
+//    }
+//
+//    #[test]
+//    fn get_row() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
+//        assert_eq!(arr1(&[4., 5., 6.]), a.get_row(1));
+//    }
+//
+//    #[test]
+//    fn get_col_as_vector() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
+//        let res = a.get_col_as_vec(1);
+//        assert_eq!(res, vec![2., 5., 8.]);
+//    }
+//
+//    #[test]
+//    fn copy_row_col_as_vec() {
+//        let m = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
+//        let mut v = vec![0f32; 3];
+//
+//        m.copy_row_as_vec(1, &mut v);
+//        assert_eq!(v, vec!(4., 5., 6.));
+//        m.copy_col_as_vec(1, &mut v);
+//        assert_eq!(v, vec!(2., 5., 8.));
+//    }
+//
+//    #[test]
+//    fn col_mean() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
+//        let res = a.column_mean();
+//        assert_eq!(res, vec![4., 5., 6.]);
+//    }
+//
+//    #[test]
+//    fn eye() {
+//        let a = arr2(&[[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+//        let res: Array2<f64> = BaseMatrix::eye(3);
+//        assert_eq!(res, a);
+//    }
+//
+//    #[test]
+//    fn rand() {
+//        let m: Array2<f64> = BaseMatrix::rand(3, 3);
+//        for c in 0..3 {
+//            for r in 0..3 {
+//                assert!(m[[r, c]] != 0f64);
+//            }
+//        }
+//    }
+//
+//    #[test]
+//    fn approximate_eq() {
+//        let a = arr2(&[[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
+//        let noise = arr2(&[[1e-5, 2e-5, 3e-5], [4e-5, 5e-5, 6e-5], [7e-5, 8e-5, 9e-5]]);
+//        assert!(a.approximate_eq(&(&noise + &a), 1e-4));
+//        assert!(!a.approximate_eq(&(&noise + &a), 1e-5));
+//    }
+//
+//    #[test]
+//    fn abs_mut() {
+//        let mut a = arr2(&[[1., -2.], [3., -4.]]);
+//        let expected = arr2(&[[1., 2.], [3., 4.]]);
+//        a.abs_mut();
+//        assert_eq!(a, expected);
+//    }
+//
+//    #[test]
+//    fn lr_fit_predict_iris() {
+//        let x = arr2(&[
+//            [5.1, 3.5, 1.4, 0.2],
+//            [4.9, 3.0, 1.4, 0.2],
+//            [4.7, 3.2, 1.3, 0.2],
+//            [4.6, 3.1, 1.5, 0.2],
+//            [5.0, 3.6, 1.4, 0.2],
+//            [5.4, 3.9, 1.7, 0.4],
+//            [4.6, 3.4, 1.4, 0.3],
+//            [5.0, 3.4, 1.5, 0.2],
+//            [4.4, 2.9, 1.4, 0.2],
+//            [4.9, 3.1, 1.5, 0.1],
+//            [7.0, 3.2, 4.7, 1.4],
+//            [6.4, 3.2, 4.5, 1.5],
+//            [6.9, 3.1, 4.9, 1.5],
+//            [5.5, 2.3, 4.0, 1.3],
+//            [6.5, 2.8, 4.6, 1.5],
+//            [5.7, 2.8, 4.5, 1.3],
+//            [6.3, 3.3, 4.7, 1.6],
+//            [4.9, 2.4, 3.3, 1.0],
+//            [6.6, 2.9, 4.6, 1.3],
+//            [5.2, 2.7, 3.9, 1.4],
+//        ]);
+//        let y: Array1<f64> = arr1(&[
+//            0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+//        ]);
+//
+//        let lr = LogisticRegression::fit(&x, &y).unwrap();
+//
+//        let y_hat = lr.predict(&x).unwrap();
+//
+//        let error: f64 = y
+//            .into_iter()
+//            .zip(y_hat.into_iter())
+//            .map(|(&a, &b)| (a - b).abs())
+//            .sum();
+//
+//        assert!(error <= 1.0);
+//    }
+//
+//    #[test]
+//    fn my_fit_longley_ndarray() {
+//        let x = arr2(&[
+//            [234.289, 235.6, 159., 107.608, 1947., 60.323],
+//            [259.426, 232.5, 145.6, 108.632, 1948., 61.122],
+//            [258.054, 368.2, 161.6, 109.773, 1949., 60.171],
+//            [284.599, 335.1, 165., 110.929, 1950., 61.187],
+//            [328.975, 209.9, 309.9, 112.075, 1951., 63.221],
+//            [346.999, 193.2, 359.4, 113.27, 1952., 63.639],
+//            [365.385, 187., 354.7, 115.094, 1953., 64.989],
+//            [363.112, 357.8, 335., 116.219, 1954., 63.761],
+//            [397.469, 290.4, 304.8, 117.388, 1955., 66.019],
+//            [419.18, 282.2, 285.7, 118.734, 1956., 67.857],
+//            [442.769, 293.6, 279.8, 120.445, 1957., 68.169],
+//            [444.546, 468.1, 263.7, 121.95, 1958., 66.513],
+//            [482.704, 381.3, 255.2, 123.366, 1959., 68.655],
+//            [502.601, 393.1, 251.4, 125.368, 1960., 69.564],
+//            [518.173, 480.6, 257.2, 127.852, 1961., 69.331],
+//            [554.894, 400.7, 282.7, 130.081, 1962., 70.551],
+//        ]);
+//        let y = arr1(&[
+//            83.0, 88.5, 88.2, 89.5, 96.2, 98.1, 99.0, 100.0, 101.2, 104.6, 108.4, 110.8, 112.6,
+//            114.2, 115.7, 116.9,
+//        ]);
+//
+//        let y_hat = RandomForestRegressor::fit(
+//            &x,
+//            &y,
+//            RandomForestRegressorParameters {
+//                max_depth: None,
+//                min_samples_leaf: 1,
+//                min_samples_split: 2,
+//                n_trees: 1000,
+//                m: Option::None,
+//            },
+//        )
+//        .unwrap()
+//        .predict(&x)
+//        .unwrap();
+//
+//        assert!(mean_absolute_error(&y, &y_hat) < 1.0);
+//    }
+//}
