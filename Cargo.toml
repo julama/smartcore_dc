@@ -27,7 +27,7 @@ rand = "0.7.3"
 rand_distr = "0.3.0"
 serde = { version = "1.0.115", features = ["derive"] }
 serde_derive = "1.0.115"
-rust_decimal = {git = "https://github.com/julama/rust-decimal", features = ["maths"]}
+rust_decimal = {git = "https://github.com/julama/rust-decimal", features = ["maths", "serde-str"]}
 
 [dev-dependencies]
 criterion = "0.3"
